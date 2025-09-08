@@ -3,7 +3,7 @@ const qrcode = require("qrcode-terminal");
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
-const { createClient } = require("@supabase/supabase-js");
+
 
 // ================= Supabase Config =================
 
@@ -157,4 +157,5 @@ process.on("SIGINT", async () => {
   await client.destroy();
   process.exit(0);
 });
+
 
