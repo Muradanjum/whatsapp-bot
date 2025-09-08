@@ -19,7 +19,7 @@ const client = new Client({
         clientId: "github-actions-bot"
     }),
     puppeteer: { 
-        headless: true,  // GitHub Actions mein headless true hona chahiye
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -57,34 +57,66 @@ client.on("ready", () => {
 // Function to send message to n8n cloud webhook
 async function sendToN8N(message, from) {
     try {
+        console.log('📤 Sending to n8n webhook...');
+        console.log('🔗 Webhook URL: https://muradanjum.app.n8n.cloud/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2');
+        console.log('💬 Message:', message);
+        console.log('👤 From:', from);
+
         const res = await axios.post(
             'https://muradanjum.app.n8n.cloud/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2',
-            { from, message },
-            { timeout: 10000 }  // 10 second timeout
+            { 
+                from: from,
+                message: message,
+                timestamp: new Date().toISOString()
+            },
+            { 
+                timeout: 15000,  // 15 second timeout
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'WhatsApp-Bot/1.0'
+                }
+            }
         );
 
+        console.log('✅ n8n response status:', res.status);
+        console.log('✅ n8n response data:', JSON.stringify(res.data));
+        
         if (res.data && res.data.reply) {
             await client.sendMessage(from, res.data.reply);
+            console.log('📩 Reply sent to user');
+        } else {
+            console.log('ℹ️ No reply from n8n');
         }
-        console.log('📤 Message processed successfully');
+        
     } catch (err) {
-        console.error('❌ Error sending to n8n:', err.message);
+        console.error('❌ n8n error:', err.message);
+        if (err.response) {
+            console.error('❌ HTTP status:', err.response.status);
+            console.error('❌ Response data:', JSON.stringify(err.response.data));
+        } else if (err.request) {
+            console.error('❌ No response received from n8n');
+            console.error('❌ Request details:', err.request);
+        }
     }
 }
 
 // Message event
 client.on("message", async (message) => {
-    // Status messages ignore karo
-    if (message.from === 'status@broadcast') return;
+    // Ignore status updates and group messages
+    if (message.from === 'status@broadcast' || message.from.includes('@g.us')) {
+        console.log('⏩ Ignoring group/status message');
+        return;
+    }
     
-    console.log(`📩 New message from ${message.from}: ${message.body.substring(0, 50)}${message.body.length > 50 ? '...' : ''}`);
+    console.log(`📩 New message from ${message.from}: ${message.body}`);
+    console.log(`🔄 Processing message...`);
+    
     await sendToN8N(message.body, message.from);
 });
 
 // Handle errors
 client.on("auth_failure", (msg) => {
     console.log("❌ Authentication failed:", msg);
-    // Corrupted session delete karo
     if (fs.existsSync(SESSION_FILE)) {
         fs.unlinkSync(SESSION_FILE);
         console.log("🗑️ Corrupted session deleted. New QR code needed.");
