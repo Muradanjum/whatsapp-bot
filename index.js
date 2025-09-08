@@ -8,6 +8,9 @@ const path = require('path');
 const SESSION_DIR = '.wwebjs_auth';
 const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
+// NEW WEBHOOK URL - Updated with your new URL
+const WEBHOOK_URL = 'https://muradanjum.app.n8n.cloud/webhook-test/b579e8e2-3e0b-4dee-9f53-1f9b30f96ff5';
+
 // Check if session exists
 function sessionExists() {
     return fs.existsSync(SESSION_FILE);
@@ -35,12 +38,10 @@ const client = new Client({
     takeoverTimeoutMs: 30000
 });
 
-// QR code event - only show if no session
+// QR code event
 client.on("qr", (qr) => {
     console.log("📱 QR Code generate hua, phone se scan karo:");
     qrcode.generate(qr, { small: true });
-    console.log("⚠️ Yeh QR code sirf 60 seconds ke liye valid hai!");
-    console.log("✅ Scan karne ke baad session save ho jayega");
 });
 
 // Authentication event
@@ -51,26 +52,27 @@ client.on("authenticated", () => {
 // Bot ready
 client.on("ready", () => {
     console.log("✅ WhatsApp bot ready hai!");
-    console.log("🤖 Bot ab automatically messages process karega");
+    console.log("🤖 Webhook URL:", WEBHOOK_URL);
+    console.log("🚀 Bot ab messages process karega");
 });
 
 // Function to send message to n8n cloud webhook
 async function sendToN8N(message, from) {
     try {
         console.log('📤 Sending to n8n webhook...');
-        console.log('🔗 Webhook URL: https://muradanjum.app.n8n.cloud/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2');
+        console.log('🔗 URL:', WEBHOOK_URL);
         console.log('💬 Message:', message);
         console.log('👤 From:', from);
 
         const res = await axios.post(
-            'https://muradanjum.app.n8n.cloud/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2',
+            WEBHOOK_URL,  // NEW URL HERE
             { 
                 from: from,
                 message: message,
                 timestamp: new Date().toISOString()
             },
             { 
-                timeout: 15000,  // 15 second timeout
+                timeout: 15000,
                 headers: {
                     'Content-Type': 'application/json',
                     'User-Agent': 'WhatsApp-Bot/1.0'
@@ -79,7 +81,6 @@ async function sendToN8N(message, from) {
         );
 
         console.log('✅ n8n response status:', res.status);
-        console.log('✅ n8n response data:', JSON.stringify(res.data));
         
         if (res.data && res.data.reply) {
             await client.sendMessage(from, res.data.reply);
@@ -95,7 +96,6 @@ async function sendToN8N(message, from) {
             console.error('❌ Response data:', JSON.stringify(err.response.data));
         } else if (err.request) {
             console.error('❌ No response received from n8n');
-            console.error('❌ Request details:', err.request);
         }
     }
 }
