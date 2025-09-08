@@ -17,21 +17,19 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install Chrome (Chromium)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-chromedriver
-        sudo ln -s /usr/bin/chromium-browser /usr/bin/chrome
-        sudo ln -s /usr/bin/chromium-browser /usr/bin/chromium
-        echo "Chrome installed at: $(which chromium-browser)"
-
-    - name: Install dependencies
+    - name: Install specific whatsapp-web.js version
       run: |
         npm install whatsapp-web.js@1.23.0
         npm install axios qrcode-terminal
         npm audit fix --force || true
 
-    - name: Clean cache
+    - name: Install Chrome (Fixed)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser chromium-chromedriver || true
+        echo "Chrome installed successfully"
+
+    - name: Clean cache directories
       run: |
         rm -rf .wwebjs_cache
         mkdir -p .wwebjs_auth
@@ -40,7 +38,6 @@ jobs:
     - name: Run WhatsApp Bot
       run: |
         export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-        export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
         export NODE_ENV=production
         echo "🚀 Starting WhatsApp Bot..."
         echo "📱 QR code generate hoga..."
