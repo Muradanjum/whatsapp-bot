@@ -1,19 +1,33 @@
 {
   "name": "whatsapp-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "WhatsApp Bot with n8n Integration",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "gh-actions": "export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser && node index.js",
+    "install-chrome": "sudo apt-get update && sudo apt-get install -y chromium-browser",
+    "test": "echo \"Bot test successful\" && exit 0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "automation",
+    "n8n"
+  ],
+  "author": "Murad Anjum",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.11.0",
-    "express": "^5.1.0",
-    "puppeteer": "^24.19.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.33.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
