@@ -1,48 +1,33 @@
-name: WhatsApp Bot Runner
-
-on:
-  workflow_dispatch:
-
-jobs:
-  run-bot:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-
-    - name: Install Chrome (Chromium)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-chromedriver
-        sudo ln -s /usr/bin/chromium-browser /usr/bin/chrome
-        sudo ln -s /usr/bin/chromium-browser /usr/bin/chromium
-        echo "Chrome installed at: $(which chromium-browser)"
-
-    - name: Install dependencies
-      run: |
-        npm install whatsapp-web.js@1.23.0
-        npm install axios qrcode-terminal
-        npm audit fix --force || true
-
-    - name: Clean cache
-      run: |
-        rm -rf .wwebjs_cache
-        mkdir -p .wwebjs_auth
-        mkdir -p .wwebjs_cache
-
-    - name: Run WhatsApp Bot
-      run: |
-        export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-        export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-        export NODE_ENV=production
-        echo "🚀 Starting WhatsApp Bot..."
-        echo "📱 QR code generate hoga..."
-        echo "⏳ 60 seconds ke liye valid hai..."
-        node index.js
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot with n8n Integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "gh-actions": "export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser && node index.js",
+    "install-chrome": "sudo apt-get update && sudo apt-get install -y chromium-browser",
+    "test": "echo \"Bot test successful\" && exit 0"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "automation",
+    "n8n"
+  ],
+  "author": "Murad Anjum",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "1.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
