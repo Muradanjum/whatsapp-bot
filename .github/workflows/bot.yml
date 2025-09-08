@@ -17,6 +17,10 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'  # Yeh line add karo
+
+    - name: Generate package-lock.json
+      run: npm install --package-lock-only  # Pehle lock file generate karo
 
     - name: Install dependencies
       run: npm install
@@ -30,5 +34,5 @@ jobs:
       run: |
         export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
         export NODE_ENV=production
-        echo "Starting WhatsApp Bot..."
+        echo "🚀 Starting WhatsApp Bot..."
         node index.js
