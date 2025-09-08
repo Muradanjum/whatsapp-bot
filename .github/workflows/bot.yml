@@ -1,52 +1,34 @@
 name: WhatsApp Bot Runner
 
 on:
-  workflow_dispatch:  # Manual trigger
-  schedule:
-    - cron: '0 */6 * * *'  # Har 6 ghante auto-restart
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 hours max
+    timeout-minutes: 30
 
     steps:
-    # Step 1: Code checkout
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Step 2: Node.js setup (without cache)
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        # Cache hata diya
+    - name: Install Node.js and npm
+      run: |
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        node --version
+        npm --version
 
-    # Step 3: Dependencies install
     - name: Install dependencies
       run: |
         npm install
-        npm audit fix
 
-    # Step 4: Chrome install
     - name: Install Chrome
       run: |
         sudo apt-get update
         sudo apt-get install -y chromium-browser
-        echo "Chrome installed successfully"
 
-    # Step 5: Create session directory
-    - name: Create session directory
-      run: |
-        mkdir -p .wwebjs_auth
-        echo "Session directory created"
-
-    # Step 6: Run WhatsApp Bot
     - name: Run WhatsApp Bot
       run: |
         export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-        export NODE_ENV=production
-        echo "🚀 Starting WhatsApp Bot..."
-        echo "📱 QR code generate hoga, ready raho scan karne ke liye"
         node index.js
-        
