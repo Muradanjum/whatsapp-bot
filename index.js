@@ -2,14 +2,10 @@ const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const axios = require("axios");
 
-// Installed Chrome path
-const CHROME_PATH = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: { 
         headless: false,
-        executablePath: CHROME_PATH,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -32,20 +28,20 @@ client.on("ready", () => {
     console.log("WhatsApp bot ready hai ✅");
 });
 
-// Function to send message to local n8n webhook
+// Function to send message to n8n cloud webhook
 async function sendToN8N(message, from) {
     try {
         const res = await axios.post(
-            'http://localhost:5678/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2',
+            'https://muradanjum.app.n8n.cloud/webhook-test/cd60a282-5296-497a-bde3-932edccaf3f2',
             { from, message }
         );
 
         if (res.data.reply) {
             await client.sendMessage(from, res.data.reply);
         }
-        console.log('Message sent to local n8n', res.data);
+        console.log('Message sent to n8n cloud', res.data);
     } catch (err) {
-        console.error('Error sending to local n8n', err.message);
+        console.error('Error sending to n8n cloud', err.message);
     }
 }
 
