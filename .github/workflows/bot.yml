@@ -12,16 +12,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Node.js and npm
-      run: |
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-        node --version
-        npm --version
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-    - name: Install dependencies
+    - name: Install dependencies with audit fix
       run: |
         npm install
+        npm audit fix --force || true  # Force fix karo, aur agar fail bhi ho toh continue karo
 
     - name: Install Chrome
       run: |
@@ -31,4 +30,7 @@ jobs:
     - name: Run WhatsApp Bot
       run: |
         export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+        export NODE_ENV=production
+        echo "🚀 Starting WhatsApp Bot..."
+        echo "📱 QR code generate hoga, ready raho scan karne ke liye"
         node index.js
