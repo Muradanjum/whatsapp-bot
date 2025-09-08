@@ -1,0 +1,47 @@
+name: WhatsApp Bot Runner
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 */6 * * *'  # Har 6 ghante auto-restart
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours max
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser
+
+    - name: Create session directory
+      run: mkdir -p .wwebjs_auth
+
+    - name: Restore Session Cache
+      uses: actions/cache@v3
+      with:
+        path: .wwebjs_auth
+        key: whatsapp-session-${{ github.ref }}
+        restore-keys: |
+          whatsapp-session-
+
+    - name: Run WhatsApp Bot
+      run: |
+        export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+        export NODE_ENV=production
+        echo "🚀 Starting WhatsApp Bot..."
+        node index.js
