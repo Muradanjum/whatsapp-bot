@@ -140,3 +140,22 @@ client.on("message", async (message) => {
   }
 
   // 2) Forward to n8n
+  await sendToN8N(message.body, message.from);
+});
+
+// ================= Initialize Client =================
+console.log(fs.existsSync(SESSION_FILE) ? "🔑 Existing session found, restoring..." : "🆕 New session needed, QR code will generate");
+client.initialize();
+
+// ================= Graceful Shutdown =================
+process.on("SIGTERM", async () => {
+  console.log("🔄 GitHub Actions is stopping the bot...");
+  await client.destroy();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("🔄 Bot shutting down gracefully...");
+  await client.destroy();
+  process.exit(0);
+});
