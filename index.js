@@ -6,9 +6,7 @@ const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
 
 // ================= Supabase Config =================
-const SUPABASE_URL = "https://rqubawqzgnawhcltyood.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdWJhd3F6Z25hd2hjbHR5b29kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMzI2MDEsImV4cCI6MjA3MjkwODYwMX0.JfBRuhWTPsuzohKsx3TSucIdZzslOBru28x1ufOaWsM";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 // ================= Session Config =================
 const SESSION_DIR = ".wwebjs_auth";
@@ -159,3 +157,4 @@ process.on("SIGINT", async () => {
   await client.destroy();
   process.exit(0);
 });
+
